@@ -14,13 +14,18 @@
     },
     "ios": {
       "supportsTablet": true,
-      "package": "com.SilentZone.SilentZone"
+      "package": "com.SilentZone.SilentZone",
+      "googleMaps": {
+        "apiKey": "AIzaSyBPoCFNXVv0ID5cbsoEjnQIcDYTGwY6QTI"
+      },
+      "bundleIdentifier": "com.anonymous.SilzentZone"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.SilzentZone"
     },
     "web": {
       "bundler": "metro",

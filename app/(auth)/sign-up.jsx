@@ -1,6 +1,7 @@
 import { View, Text, ScrollView, Image, Alert} from 'react-native'
 import React, {useState} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useGlobalContext } from "../../context/GlobalProvider";
 
 import { images } from '../../constants'
 import FormField from '../../components/FormField'
@@ -9,20 +10,21 @@ import { Link, router } from 'expo-router'
 import { createUser } from '../../lib/appwrite'
 
 const SignUp = () => {
+    const { setUser, setIsLogged } = useGlobalContext();
+  
+    const [isSubmitting, setSubmitting] = useState(false);
     const [form, setForm] = useState({
-        username: '',
-        email: '',
-        password: '',
-    })
-
-    const [isSubmitting, setisSubmitting] = useState(false)
+      username: "",
+      email: "",
+      password: "",
+    });
 
     const submit = async() => {
         if(!form.username || !form.email || !form.password)
         {
             Alert.alert('Error', "Please fill in all the fields")
         }
-        setisSubmitting(true);
+        setSubmitting(true);
         try {
            const result = await createUser(form.email,form.password,form.username)
            setUser(result);
@@ -31,7 +33,7 @@ const SignUp = () => {
         } catch (error) {
             Alert.alert('Error', error.message)
         } finally {
-            setisSubmitting(false)
+            setSubmitting(false)
         }
     }
     
