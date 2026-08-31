@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["SilentZoneRingerModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.silentzoneringer.SilentZoneRingerModule"]
+  }
+}

@@ -1,16 +1,13 @@
 import { StyleSheet, Text, View, Image } from 'react-native'
 import React from 'react'
-import MapView, { Callout, Marker } from 'react-native-maps';
+import { Callout, Marker } from 'react-native-maps';
+import { icons } from '../constants';
 
-export default function CustomMarker({ coordinate, title, image }) {
-    console.log('my location', coordinate);
+export default function CustomMarker({ coordinate, title, image = icons.mute }) {
   return (
-    <Marker coordinate={{
-        latitude: 6.0062877,
-        longitude: 10.2552971,
-    }}>
+    <Marker coordinate={coordinate}>
         <View style={styles.markerContainer}>
-            <Image source={image} style={styles.markerImage} />
+            <Image source={image} style={styles.markerImage} tintColor="#fff" />
         </View>
         <Callout tooltip>
           <View>

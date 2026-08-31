@@ -1,0 +1,9 @@
+{
+  "name": "silent-zone-ringer",
+  "version": "0.1.0",
+  "description": "Controls the Android ringer/Do Not Disturb interruption filter for SilentZone",
+  "main": "index.ts",
+  "license": "MIT",
+  "author": "Thanemul Islam",
+  "homepage": "https://github.com/Thanemul-Islam/SilzentZone-React"
+}

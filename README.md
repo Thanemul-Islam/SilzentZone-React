@@ -1,50 +1,89 @@
-# Welcome to your Expo app 👋
+# SilentZone
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A cross-platform mobile app (iOS/Android) built with React Native and Expo that lets you mark real-world locations as **Silent Zones** on a map. When your phone's GPS enters one, SilentZone automatically manages your ringer — silencing calls and notifications on Android, or reminding you to silence manually on iOS.
 
-## Get started
+## Why two different behaviors?
 
-1. Install dependencies
+Apple doesn't expose a public API for third-party apps to silence a phone or toggle Focus/Do Not Disturb — the OS deliberately keeps that under the user's manual control. Android does allow it, through a user-granted "Do Not Disturb access" permission. SilentZone is built around that platform reality rather than pretending it doesn't exist:
 
-   ```bash
-   npm install
-   ```
+| Platform | Behavior on zone entry |
+|---|---|
+| **Android** | Automatically silences the phone (with your choice of "Priority only" — alarms still ring — or total silence) via a small custom native module, and restores normal ringer on exit. |
+| **iOS** | Fires a local notification reminding you to silence your phone, since no automatic option exists. |
 
-2. Start the app
+## Features
 
-   ```bash
-    npx expo start
-   ```
+- Interactive map — drop a pin anywhere by long-pressing, set a custom trigger radius, and see all your zones plotted with live location
+- Local, no-backend zone management — add, edit, enable/disable, and delete zones, persisted on-device
+- Background geofencing — detects zone entry/exit even while the app is closed
+- Per-user silence preference (Android) — Priority-only vs. total silence
+- Permission-aware Settings screen — clear status for location, notifications, and (Android) Do Not Disturb access, each with a one-tap request
 
-In the output, you'll find options to open the app in a
+## Tech stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **React Native** + **Expo** (SDK 54, Expo Router for file-based navigation)
+- **react-native-maps** for the map and geofence visualization
+- **expo-location** + **expo-task-manager** for background geofencing
+- **expo-notifications** for zone-entry alerts
+- **AsyncStorage** for local persistence — no backend, no accounts
+- A custom local Expo native module (Kotlin) for Android ringer/Do Not Disturb control
+- **NativeWind** (Tailwind for React Native) for styling
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Getting started
 
-## Get a fresh project
+### Prerequisites
+- Node.js and npm
+- A Google Maps API key (get one from [Google Cloud Console](https://console.cloud.google.com/)) — separate keys are recommended for iOS and Android, each restricted to this app's bundle ID/package name
 
-When you're ready, run:
+### Setup
 
 ```bash
-npm run reset-project
+npm install
+cp .env.example .env
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Then fill in `.env` with your Google Maps API key(s):
 
-## Learn more
+```
+GOOGLE_MAPS_IOS_API_KEY=your_ios_key_here
+GOOGLE_MAPS_ANDROID_API_KEY=your_android_key_here
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### Running the app
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Because SilentZone includes a custom native module, it can't run in the plain Expo Go app — it needs a development build:
 
-## Join the community
+```bash
+npx expo run:ios       # requires Xcode 16.1+
+npx expo run:android   # requires Android Studio/SDK, or build via EAS
+```
 
-Join our community of developers creating universal apps.
+## Project structure
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```
+app/                    Expo Router screens (file-based routing)
+  (tabs)/               Map, Zones, and Settings tabs
+  zone/[id].jsx          Add/edit a zone
+  _layout.jsx            Root layout: fonts, splash screen, geofencing task registration
+context/
+  ZoneProvider.js         Zone CRUD + AsyncStorage persistence + geofencing sync
+components/               Reusable UI (CustomButton, FormField, CustomMarker)
+tasks/
+  geofenceTask.js         Background task: handles zone enter/exit events
+lib/
+  notifications.js         Local notification setup and dispatch
+  settingsStorage.js       Persisted user preferences (silence mode)
+modules/
+  silent-zone-ringer/       Custom native module: Android ringer/DND control, iOS no-op stub
+```
+
+## Current status
+
+- ✅ Core app (map, zone management, permissions) — built and verified working
+- 🚧 Background geofencing and Android auto-silence — implemented, pending on-device verification
+- 📋 Planned: calendar-aware and schedule-based zone rules, zone history/analytics
+
+## Platform notes
+
+- **iOS region monitoring limit**: Apple caps monitored geofence regions at 20 per app.
+- **Android Do Not Disturb access** has no in-app permission dialog — the app opens the relevant system settings screen for you to grant it manually.
